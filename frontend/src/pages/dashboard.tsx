@@ -27,7 +27,7 @@ function Dashboard() {
       if(!acc[date]){
         acc[date] = {total:0 , count:0};
       }
-      acc[date].total += t.percentage;
+      acc[date].total += t.percentage ?? 0;
       acc[date].count++;
       return acc;
     },{} as Record<string, {total: number, count: number}>)
