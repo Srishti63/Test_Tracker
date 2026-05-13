@@ -80,6 +80,11 @@ func main() {
 
 	}
 	// 5. START SERVER
-	log.Println("Server starting on :8080...")
-	r.Run(":8080")
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+
+	log.Println("Server starting on :", port)
+	r.Run(":" + port)
 }
