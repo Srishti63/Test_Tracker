@@ -1,11 +1,11 @@
 package main
 
 import (
-	"log"
-
 	"github.com/gin-gonic/gin"
-	"gorm.io/driver/sqlite"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"log"
+	"os"
 
 	"github.com/Srishti63/testtracker/backend/controllers"
 	"github.com/Srishti63/testtracker/backend/middleware"
@@ -23,16 +23,17 @@ func main() {
 		log.Fatal("Error loading this .env file", err)
 	}
 
-
 	// 1. DATABASE SETUP
-	// Using SQLite 
-	db, err := gorm.Open(sqlite.Open("test_tracker.db"), &gorm.Config{})
+	dsn := os.Getenv("DATABASE_URL")
+
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+
 	if err != nil {
 		log.Fatal("Failed to connect to database:", err)
 	}
 
 	// AutoMigrate will create the "test_records" ,"user" table automatically based on struct
-	db.AutoMigrate(&models.TestRecord{}, &models.User{}) 
+	db.AutoMigrate(&models.TestRecord{}, &models.User{})
 
 	// 2. DEPENDENCY INJECTION (The "Wiring")
 	// ---WIRING FOR TEST----
@@ -48,7 +49,7 @@ func main() {
 	// 3. ROUTER SETUP
 	r := gin.Default()
 
-	// Handle CORS 
+	// Handle CORS
 	r.Use(func(c *gin.Context) {
 		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
 		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
@@ -74,7 +75,7 @@ func main() {
 		api.GET("/tests", testController.GetAllTestsHandler)
 		api.GET("/tests/heatmap", testController.GetHeatmapHandler)
 		api.GET("/tests/progress", testController.GetProgressData)
-		api.DELETE("/tests/:id",testController.DeleteTestHandler)
+		api.DELETE("/tests/:id", testController.DeleteTestHandler)
 		api.DELETE("/tests/subject/:subject", testController.DeleteAllHandler)
 
 	}
